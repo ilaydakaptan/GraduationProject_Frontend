@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>EMOJI SIHIRBAZI</title>
+    <style>
+        body {
+            background-image: url(https://img.freepik.com/free-vector/hand-drawn-world-emoji-day-background-with-emoticons_23-2149418959.jpg?w=1380&t=st=1704808901~exp=1704809501~hmac=916bfd4ee0d170b114ee0e86c25d94c056b7318e969163b128624fe53025feda);
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .centered-box {
+            position: relative;
+            width: 50%;
+            margin: -50px; 
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #textInput {
+            height: 140px;
+            resize: none; 
+        }
+
+        #warning {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .icon-buttons {
+            bottom: 0;
+            right: 0;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            margin-right: 10px;
+            margin-left: 150px;
+        }
+
+        .icon-buttons button {
+            margin-left: 10px;
+        }
+
+        #emojiDiv {
+            display: none;
+            position: absolute;
+            top: 50%;
+            right: 25%;
+            transform: translate(0, -50%);
+            font-size: 110px;
+        }
+    
+        #feedbackSection {
+            position: absolute;
+            top: 50%;
+            right: 5%; 
+            transform: translate(0, -50%);
+            text-align: right;
+        }
+
+        #feedbackSection button {
+            margin: 0 6px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .info-button-container {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1000; 
+    }
+
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="info-button-container">
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#infoModal">
+                <i class="fas fa-info-circle"></i> Emoji Sihirbazı Hakkında
+            </button>
+        </div>
+        <div class="centered-box">
+            <h1 class="text-center" style="color: rgb(25, 63, 200);"> ✨ Emoji Sihirbazı ✨ </h1>
+            <div class="form-group">
+                <label for="textInput"><strong>Metinin duygu durumuna göre emoji önermek için:</strong></label>
+                <textarea class="form-control" id="textInput" maxlength="200" placeholder="Buraya metin giriniz..."></textarea>
+                <small id="charCount" class="text-muted">Maksimum 200 karakter</small>
+                <div id="warning">Daha doğru yanıtlar almak için lütfen yazım yanlışı yapmamaya özen gösteriniz.</div>
+            </div>            
+
+            <!-- Butonları içeren div -->
+            <div class="icon-buttons">
+                <button type="button" class="btn btn-primary" onclick="castMagic()">
+                    <i class="fas fa-broom"></i> HOKUS
+                </button>
+                <button type="button" class="btn btn-primary" onclick="guess()">
+                    <i class="fas fa-magic"></i> POKUS
+                </button>
+            </div>
+        </div>
+        
+      <!-- emojileri içeren div -->
+        <div id="emojiDiv">
+            <% if (htmlResult.includes("0")) { %>
+                <div id="smileEmoji">😄</div>
+            <% } %>
+            <% if (htmlResult.includes("1")) { %>
+                <div id="loveEmoji">❤️</div>
+            <% } %>
+            <% if (htmlResult.includes("2")) { %>
+                <div id="sadEmoji">☹️</div>  
+            <% } %>
+            <% if (htmlResult.includes("3")) { %>
+                <div id="shockEmoji">😱</div>         
+            <% } %>
+        </div>
+
+        
+        <!-- Soru ve feedback butonları içeren div -->
+        <div id="feedbackSection" style="display: none;"></div>
+
+    </div>
+
+    <script>
+
+        var htmlResult = '<%= htmlResult %>';
+
+        document.getElementById('textInput').addEventListener('input', function () {
+            var currentLength = this.value.length;
+            var maxLength = parseInt(this.getAttribute('maxlength'));
+            var remainingCharacters = maxLength - currentLength;
+            document.getElementById('charCount').innerText = 'Maksimum ' + maxLength + ' karakter (Kalan: ' + remainingCharacters + ')';
+        });
+        
+        function castMagic() {
+            for (let i = 0; i < 2; i++) {
+                const textInput = document.getElementById('textInput').value;
+
+                // Check if the text input is not empty before making the server request
+                if (textInput.trim() !== '') {
+                    fetch('/submit-text', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ textInput }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                            // Handle the response as needed
+                            htmlResult = 'Text submitted successfully with ID: ' + data.insertedRow.id;
+                            location.reload();
+                        })
+                        .catch(error => console.error('Fetch error:', error));
+                } else {
+                    console.error('Text input is empty. Please enter some text.');
+                }
+            }
+        }
+
+        function guess() {
+            location.reload();
+        }
+    
+        function showEmoji() {
+            // emojiyi göster
+
+            let customValue;
+
+            if (htmlResult.includes("0") && htmlResult.includes("1") && htmlResult.includes("2") && htmlResult.includes("3")){
+                customValue = "%25";
+            } else if (htmlResult.includes("0") && htmlResult.includes("1") && htmlResult.includes("2")){
+                customValue = "%33";
+            } else if (htmlResult.includes("0") && htmlResult.includes("1") && htmlResult.includes("3")){
+                customValue = "%33";
+            } else if (htmlResult.includes("0") && htmlResult.includes("3") && htmlResult.includes("2")){
+                customValue = "%33";
+            } else if (htmlResult.includes("3") && htmlResult.includes("1") && htmlResult.includes("2")){
+                customValue = "%33";
+            } else if (htmlResult.includes("0") && htmlResult.includes("1")){
+                customValue = "%50";
+            } else if (htmlResult.includes("0") && htmlResult.includes("2")){
+                customValue = "%50";
+            } else if (htmlResult.includes("0") && htmlResult.includes("3")){
+                customValue = "%50";
+            } else if (htmlResult.includes("1") && htmlResult.includes("2")){
+                customValue = "%50";
+            } else if (htmlResult.includes("1") && htmlResult.includes("3")){
+                customValue = "%50";
+            } else if (htmlResult.includes("2") && htmlResult.includes("3")){
+                customValue = "%50";
+            } else if (htmlResult.includes("0") && htmlResult.includes("2")){
+                customValue = "%50";
+            } else if (htmlResult.includes("0") || htmlResult.includes("1") || htmlResult.includes("2") || htmlResult.includes("3")) {
+                customValue = "%100";
+            }
+
+            if ( htmlResult.includes("0")) {
+                let smileEmojiElement = document.getElementById('smileEmoji');
+                smileEmojiElement.innerHTML = '😄'; 
+                
+                let customText = document.createElement('span');
+                customText.style.position = 'relative';
+                customText.style.fontSize = '25px';
+                customText.innerHTML = customValue.toString();
+                smileEmojiElement.appendChild(customText);  
+            } 
+            
+            if ( htmlResult.includes("1")) {
+                let loveEmojiElement = document.getElementById('loveEmoji');
+                loveEmojiElement.innerHTML = '❤️'; 
+                
+                let customText = document.createElement('span');
+                customText.style.position = 'relative';
+                customText.style.fontSize = '25px';
+                customText.innerHTML = customValue.toString();
+                loveEmojiElement.appendChild(customText);
+            } 
+            
+            if ( htmlResult.includes("2")) {
+                let sadEmojiElement = document.getElementById('sadEmoji');
+                sadEmojiElement.innerHTML = '☹️'; 
+                
+                let customText = document.createElement('span');
+                customText.style.position = 'relative';
+                customText.style.fontSize = '25px';
+                customText.innerHTML = customValue.toString();
+                sadEmojiElement.appendChild(customText);                     
+            } 
+            
+            if ( htmlResult.includes("3")) {
+                let shockEmojiElement = document.getElementById('shockEmoji');
+                shockEmojiElement.innerHTML = '😱'; 
+                
+                let customText = document.createElement('span');
+                customText.style.position = 'relative';
+                customText.style.fontSize = '25px';
+                customText.innerHTML = customValue.toString();
+                shockEmojiElement.appendChild(customText);   
+            }
+            document.getElementById('emojiDiv').style.display = 'block'; 
+        }
+    
+    
+        function showFeedbackSection() {
+            // Soru ve butonları göster
+            var feedbackSection = document.getElementById('feedbackSection');
+            feedbackSection.innerHTML = '<p><strong>Sizce bu yanıt doğru mu ?</strong></p>' +
+                '<button class="btn btn-success" onclick="likeAnswer()"><i class="fas fa-thumbs-up"></i></button>' +
+                '<button class="btn btn-danger" onclick="unlikeAnswer()"><i class="fas fa-thumbs-down"></i></button>';
+            feedbackSection.style.display = 'block';
+        }
+    
+    
+        function likeAnswer() {
+            // Like butonuna tıklandığında yapılacak işlemler
+            var feedbackSection = document.getElementById('feedbackSection');
+            feedbackSection.innerHTML = '<p style="text-align: center;"><strong>Teşekkürler, yanıtınız kaydedildi!</strong></p>';
+            setTimeout(function () {
+                feedbackSection.style.display = 'none';
+                feedbackSection.innerHTML = '';
+            }, 5000); // Hide the message after 5 seconds
+        }
+    
+        function unlikeAnswer() {
+            // unlike butonuna tıklandığında yapılacak işlemler
+            var feedbackSection = document.getElementById('feedbackSection');
+            feedbackSection.innerHTML = '<p style="text-align: center;"><strong>Geliştirmeye devam edeceğiz!</strong></p>';
+            setTimeout(function () {
+                feedbackSection.style.display = 'none';
+                feedbackSection.innerHTML = '';
+            }, 5000); // Hide the message after 5 seconds
+        }
+
+        window.onload = function() {
+            showEmoji();
+            showFeedbackSection();
+
+            var textInput = document.getElementById('textInput');
+            // Tarayıcı yerel hafızasında saklanan son metni al
+            var savedText = localStorage.getItem('savedText');
+            // Eğer tarayıcı yerel hafızasında saklanan metin varsa, onu <textarea> alanına yerleştir
+            if (savedText) {
+                textInput.value = savedText;
+            }
+
+            // <textarea> alanındaki metin değiştiğinde, yeni metni tarayıcı yerel hafızaya kaydet
+            textInput.addEventListener('input', function() {
+                localStorage.setItem('savedText', textInput.value);
+            });
+        };
+
+
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Emoji Sihirbazı Nasıl Çalışır?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu sihirbaz, yazdığınız metinin duygu durumunu anlamaya çalışarak metini 4 farklı kategori içerisinde sınıflandırır ve buna uygun bir emoji önerir.</p>
+                    <p>Kategoriler:</p>
+                        <p> - Komik bulma 😄</p>
+                        <p> - Beğenme ❤️</p>
+                        <p> - Beğenmeme ☹️</p>
+                        <p> - Şaşırma 😱 </p>                                        
+                    <p>Bu sihirbaz sadece Türkçe dilinde yazılan metinleri desteklemektedir. Daha tutarlı sonuçlar için yazım yanlışlarına dikkat etmeyi unutmayınız.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
